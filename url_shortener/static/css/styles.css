@@ -1,0 +1,23 @@
+html,
+body {
+  height: 100%;
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.center-form {
+  width: 600px;
+  padding: 30px;
+  border-radius: 17px;
+  border: 0.1rem solid #333333;
+  margin: 10% 10px auto 10px;
+}
+
+.btn {
+  width: 140px;
+}

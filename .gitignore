@@ -1,2 +1,5 @@
-venv/
-.vscode/
+__pycache__/
+tmp/
+url_shortener/url.db
+url_shortener/__pycache__
+stderr.log

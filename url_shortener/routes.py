@@ -1,12 +1,13 @@
-from flask import url_for, redirect, flash, jsonify, request
+from flask import url_for, redirect, flash, jsonify, request, render_template
 from url_shortener import app, db
 # Uncomment the two lines below to implement Model and Form
 from url_shortener.models import URL
+from url_shortener.forms import URL as url_form
 import shortuuid
 import re
 
 def validate_short_url(short_url):
-    if re.match('(\w)+$', short_url):
+    if re.match('^[A-Za-z0-9_-]+$', short_url):
         return True
     return False
 
@@ -27,31 +28,36 @@ def generate_short_url():
 
     return short_url
 
-@app.route('/', methods=['POST'])
-def home():
-    data = request.get_json()
+@app.route('/', methods=['GET', 'POST'])
+def idx():
+    form = url_form()
 
-    if 'short_url' in data:
-        if (len(short_url := data['short_url'].strip()) > 0):
+    if form.validate_on_submit():
+        short_url = form.short_url.data
+        if (len(short_url := short_url.strip()) > 0):
             if not validate_short_url(short_url):
-                return jsonify({ 'message' : f'{short_url} can only contain alphanumeric character and _' })
+                return jsonify({ 'message' : f'{short_url} can only contain alphanumeric character, - and _' })
             if short_url_exists(short_url):
                 return jsonify({ 'message' : f'{short_url} is already in use' })
         else:
             short_url = generate_short_url()
-    else:
-        short_url = generate_short_url()
+        
+        redirect_url = form.url.data
+        if redirect_url.startswith('http://'):
+            redirect_url = redirect_url.replace('http://', '')
+        elif redirect_url.startswith('https://'):
+            redirect_url = redirect_url.replace('https://', '')
+        if len(redirect_url := redirect_url.strip()) > 0:
+            url = URL(short_url=short_url, redirect_url=redirect_url)
+            db.session.add(url)
+            db.session.commit()
 
-    if len(redirect_url := data['redirect_url'].strip()) > 0:
-        url = URL(short_url=short_url, redirect_url=redirect_url)
-        db.session.add(url)
-        db.session.commit()
+            return render_template('post-creation.html', url=f'{request.base_url}{short_url}')
+        else:
+            return jsonify({ 'message' : 'url cannot be empty!' })
 
-        return jsonify({ 'message' : f'succesfully added {short_url}' })
-    else:
-        return jsonify({ 'message' : 'url cannot be empty!' })
-
-
+    return render_template('index.html', form=form)
+    
 @app.route('/<short_url>', methods=['GET'])
 def redirect_to(short_url):
     url = URL.query.filter_by(short_url=short_url).first()

@@ -6,7 +6,8 @@ from flask_script import Manager
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'C7p8HXmViPghCJSEJpkSZKMZiJrPcPHp2DjSgnL57z4ubgm8pP'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/url_shortener'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///url.db'
+# 'postgres://awesaxyz_admin:kbdzePL6t8TmRhV@localhost/awesaxyz_url' 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
