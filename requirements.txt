@@ -17,6 +17,7 @@ Mako==1.1.4
 MarkupSafe==1.1.1
 pycparser==2.20
 python-dateutil==2.8.1
+python-dotenv==0.17.1
 python-editor==1.0.4
 shortuuid==1.0.1
 six==1.15.0

@@ -18,27 +18,18 @@
   </head>
   <body>
     <div class="form-container">
-      <form method="POST" action="" class="center-form">
+      <form class="center-form" method="POST" action="" class="center-form">
         {{ form.hidden_tag() }}
         <div class="form-group">
-          <label for="url">URL</label>
-          {{ form.url(class="form-control") }}
-        </div>
-        <div class="form-group">
-          <label for="short_url">Short URL</label>
-          {{ form.short_url(class="form-control") }}
-          <small id="shortUrlHelp" class="form-text text-muted"
-            >If you do not specify short url, it will be generated
-            automatically</small
-          >
-        </div>
-        <div class="form-group">
+          {% with messages = get_flashed_messages() %} {% if messages %} {% for
+          message in messages %}
+          <div class="alert alert-danger" role="alert">{{message}}</div>
+          {% endfor %} {% endif %} {% endwith %}
           <label for="password">Password</label>
           {{ form.password(class="form-control") }}
           <small id="shortUrlHelp" class="form-text text-muted"
-            >Specify a password here if you want to protect your url with a
-            password, you can leave it empty if you want to let anyone access
-            the url</small
+            >This url is protected by a password, please enter the password to
+            access the link</small
           >
         </div>
         <div class="row mt-5 justify-content-center">
@@ -48,5 +39,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/post-creation.js') }}"></script>
   </body>
 </html>

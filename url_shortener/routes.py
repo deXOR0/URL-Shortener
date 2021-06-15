@@ -1,8 +1,8 @@
 from flask import url_for, redirect, flash, jsonify, request, render_template
-from url_shortener import app, db
+from url_shortener import app, db, bcrypt
 # Uncomment the two lines below to implement Model and Form
 from url_shortener.models import URL
-from url_shortener.forms import URL as url_form
+from url_shortener.forms import URL as url_form, URL_Verification as url_verification_form
 import shortuuid
 import re
 
@@ -47,8 +47,10 @@ def idx():
             redirect_url = redirect_url.replace('http://', '')
         elif redirect_url.startswith('https://'):
             redirect_url = redirect_url.replace('https://', '')
+        password = bcrypt.generate_password_hash(
+            form.password.data).decode('utf-8')
         if len(redirect_url := redirect_url.strip()) > 0:
-            url = URL(short_url=short_url, redirect_url=redirect_url)
+            url = URL(short_url=short_url, redirect_url=redirect_url, password=password)
             db.session.add(url)
             db.session.commit()
 
@@ -58,11 +60,20 @@ def idx():
 
     return render_template('index.html', form=form)
     
-@app.route('/<short_url>', methods=['GET'])
+@app.route('/<short_url>', methods=['GET', 'POST'])
 def redirect_to(short_url):
     url = URL.query.filter_by(short_url=short_url).first()
 
     if url:
+        if url.password:
+            form = url_verification_form()
+            if form.validate_on_submit():
+                if bcrypt.check_password_hash(url.password, form.password.data):
+                    return redirect(f'http://{url.redirect_url}')
+                else :
+                    flash('Password mismatch!')
+            return render_template('verification.html', form=form)
+
         return redirect(f'http://{url.redirect_url}')
     else:
         return jsonify({ 'message' : 'url not found' })

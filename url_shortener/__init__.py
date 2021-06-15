@@ -3,11 +3,14 @@ from flask_sqlalchemy import SQLAlchemy #Database connection and ORM
 from flask_bcrypt import Bcrypt #Hashing and CSRF token
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # take environment variables from .env.
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'C7p8HXmViPghCJSEJpkSZKMZiJrPcPHp2DjSgnL57z4ubgm8pP'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///url.db'
-# 'postgres://awesaxyz_admin:kbdzePL6t8TmRhV@localhost/awesaxyz_url' 
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

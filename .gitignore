@@ -1,5 +1,7 @@
 __pycache__/
+venv/
 tmp/
 url_shortener/url.db
 url_shortener/__pycache__
 stderr.log
+.env
