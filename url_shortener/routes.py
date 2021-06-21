@@ -47,10 +47,13 @@ def idx():
             redirect_url = redirect_url.replace('http://', '')
         elif redirect_url.startswith('https://'):
             redirect_url = redirect_url.replace('https://', '')
-        password = bcrypt.generate_password_hash(
-            form.password.data).decode('utf-8')
         if len(redirect_url := redirect_url.strip()) > 0:
-            url = URL(short_url=short_url, redirect_url=redirect_url, password=password)
+            if form_password := form.password.data:
+                password = bcrypt.generate_password_hash(
+                form_password).decode('utf-8')
+                url = URL(short_url=short_url, redirect_url=redirect_url, password=password)
+            else :
+                url = URL(short_url=short_url, redirect_url=redirect_url)
             db.session.add(url)
             db.session.commit()
 
